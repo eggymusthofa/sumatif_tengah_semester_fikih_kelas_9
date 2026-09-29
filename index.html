@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen Sumatif Tengah Semester - FIKIH</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
+        .hide { display: none !important; }
+    </style>
+</head>
+<body class="text-gray-800 h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-green-700 text-white p-4 shadow-md flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <img id="app-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Kementerian_Agama_new_logo.png/120px-Kementerian_Agama_new_logo.png" alt="Logo" class="h-10 w-10 object-contain bg-white rounded-full p-1">
+            <div>
+                <h1 class="text-xl font-bold">Asesmen Sumatif Tengah Semester</h1>
+                <p class="text-xs">FIKIH Kelas 9 - MTs Muallimin NU Kota Malang | Oleh: Eggy Fachrezha Musthofa</p>
+            </div>
+        </div>
+        <div id="header-user" class="font-semibold text-sm"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center p-4 overflow-y-auto" id="main-container">
+    </main>
+
+    <script>
+        const DEFAULT_CONFIG = {
+            logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Kementerian_Agama_new_logo.png/120px-Kementerian_Agama_new_logo.png',
+            kkm: 80,
+            timeLimit: 90 * 60, 
+            adminUser: 'admin',
+            adminPass: 'admin123'
+        };
+
+        // 50 SOAL LENGKAP (25 PG, 10 PG Kompleks, 10 Menjodohkan, 5 Isian)
+        const DEFAULT_QUESTIONS = [
+            // --- 25 SOAL PILIHAN GANDA (PG) ---
+            { id: 'pg1', type: 'pg', text: 'Pak Ahmad berniat kurban 1 ekor sapi bersama 6 tetangganya. Mendadak 1 tetangga mundur karena butuh biaya berobat. Waktu penyembelihan sisa 1 hari. Tindakan paling tepat agar kurban sapi tetap sah bagi ke-6 orang tersebut adalah...', options: ['A. Membatalkan sapi dan mengganti dengan 6 ekor kambing', 'B. Melanjutkan kurban, sisa 1 porsi ditanggung bersama atau dihitung sedekah', 'C. Menunda penyembelihan hingga tahun depan mencari 1 orang lagi', 'D. Mengambil sapi tersebut menjadi kurban milik Pak Ahmad sendiri secara sepihak'], answer: 1 },
+            { id: 'pg2', type: 'pg', text: 'Sebuah panti asuhan menerima daging kurban dari warga. Daging tersebut sangat melimpah hingga pengurus berinisiatif menjual sebagian daging untuk membeli beras panti. Berdasarkan hukum Islam, tindakan menjual daging kurban oleh penerima (fakir miskin/panti) adalah...', options: ['A. Boleh, karena daging sudah menjadi hak milik penerima sepenuhnya', 'B. Haram, daging kurban sama sekali tidak boleh dijual oleh siapapun', 'C. Makruh, lebih baik dibagikan semuanya ke panti lain', 'D. Boleh, asalkan izin kepada orang yang berkurban'], answer: 0 },
+            { id: 'pg3', type: 'pg', text: 'Pak Sholeh bernazar jika anaknya sembuh dari sakit parah, ia akan berkurban seekor kambing. Saat hari Idul Adha, ia menyembelih kurban nazarnya. Ketentuan pembagian daging kurban nazar milik Pak Sholeh yang tepat adalah...', options: ['A. Ia berhak memakan maksimal sepertiganya', 'B. Ia dan keluarganya haram memakan sedikitpun daging tersebut', 'C. Ia boleh menyimpan sebagian untuk persediaan lauk', 'D. Harus dibagikan dalam keadaan sudah dimasak matang'], answer: 1 },
+            { id: 'pg4', type: 'pg', text: 'Dalam memilih hewan kurban, ada kriteria ketat. Pak Yanto membeli kambing besar namun ternyata salah satu telinganya terbelah sedikit. Hukum menjadikan kambing tersebut sebagai hewan kurban adalah...', options: ['A. Tidak sah, harus sempurna tanpa cacat sedikitpun', 'B. Sah, karena cacat ringan (sobek sedikit) tidak menghalangi sahnya kurban', 'C. Makruh, dan dagingnya dibuang saja', 'D. Haram disembelih'], answer: 1 },
+            { id: 'pg5', type: 'pg', text: 'Batas akhir penyembelihan hewan kurban adalah sebelum terbenam matahari pada tanggal 13 Dzulhijjah. Jika seseorang menyembelih kurbannya pada tanggal 14 Dzulhijjah karena lupa, maka status sembelihannya adalah...', options: ['A. Tetap sah sebagai kurban karena lupa dimaafkan', 'B. Sah sebagai kurban tapi berdosa', 'C. Menjadi sembelihan sedekah biasa, bukan ibadah kurban', 'D. Dagingnya haram dimakan'], answer: 2 },
+            { id: 'pg6', type: 'pg', text: 'Keluarga Pak Budi dikaruniai bayi laki-laki. Karena kondisi ekonomi sedang sulit akibat PHK, ia hanya mampu menyembelih 1 ekor kambing untuk akikah anaknya. Hukum akikah yang dilakukan keluarga Pak Budi adalah...', options: ['A. Tidak sah, harus menunggu sampai mampu membeli 2 ekor', 'B. Sah, 1 ekor kambing diperbolehkan bagi yang tidak mampu untuk bayi laki-laki', 'C. Dihitung hutang 1 ekor kambing di masa depan', 'D. Batal dan harus diganti sedekah beras'], answer: 1 },
+            { id: 'pg7', type: 'pg', text: 'Tradisi masyarakat saat akikah sering membagikan daging dalam bentuk masakan siap saji (matang), berbeda dengan kurban yang dibagikan mentah. Hal ini bertujuan...', options: ['A. Agar tidak perlu repot mencari bumbu', 'B. Membangun kepedulian sosial tanpa merepotkan penerima memasaknya', 'C. Syarat wajib akikah harus daging matang', 'D. Menghemat biaya pembagian'], answer: 1 },
+            { id: 'pg8', type: 'pg', text: 'Bu Rina menyembelih kambing akikah di hari ke-10 karena pada hari ke-7 bayinya masih dirawat di ruang inkubator. Hukum pelaksanaan akikah yang dilakukan Bu Rina pada hari ke-10 adalah...', options: ['A. Sah, akikah boleh dilakukan setelah hari ke-7 jika ada udzur', 'B. Batal, harus tepat hari ke-7', 'C. Menjadi haram', 'D. Harus mengganti dengan menyembelih sapi'], answer: 0 },
+            { id: 'pg9', type: 'pg', text: 'Selain menyembelih hewan, sunnah yang mengiringi kelahiran bayi pada hari ketujuh yang memiliki nilai sedekah sekaligus kesehatan adalah...', options: ['A. Mengazani telinga bayi', 'B. Mencukur rambut bayi dan bersedekah seberat rambutnya', 'C. Memberi nama bayi', 'D. Mentahnik bayi dengan kurma'], answer: 1 },
+            { id: 'pg10', type: 'pg', text: 'Pak Ali baru mengetahui setelah dewasa bahwa orang tuanya dahulu sangat miskin sehingga ia belum diakikahi. Saat ini Pak Ali sudah menjadi pengusaha sukses. Langkah yang paling tepat berdasarkan syariat adalah...', options: ['A. Memarahi orang tuanya', 'B. Mengakikahi dirinya sendiri', 'C. Membayar fidyah kepada fakir miskin', 'D. Melakukan kurban ganda setiap tahun'], answer: 1 },
+            { id: 'pg11', type: 'pg', text: 'Seorang petani di desa menjual padi yang masih hijau dan belum merunduk (ijon) kepada tengkulak karena butuh uang cepat. Transaksi ini dalam hukum Islam dilarang karena...', options: ['A. Merugikan pihak tengkulak secara pasti', 'B. Mengandung unsur gharar (ketidakjelasan) kuantitas panen', 'C. Padi hijau haram dikonsumsi', 'D. Tengkulak menawar terlalu murah'], answer: 1 },
+            { id: 'pg12', type: 'pg', text: 'Doni membeli sepatu lewat toko online dengan sistem Cash On Delivery (COD). Saat barang tiba, ia bisa melihat fisiknya sebelum menyerahkan uang. Sistem ini memenuhi rukun jual beli berupa...', options: ['A. Ijab qabul lisan bahasa Arab', 'B. Hadirnya penjual di lokasi', 'C. Kejelasan barang, harga, dan kerelaan kedua pihak', 'D. Penghapusan unsur pajak'], answer: 2 },
+            { id: 'pg13', type: 'pg', text: 'Sebuah pabrik menjual limbah kotoran sapi kepada petani sayur untuk dijadikan pupuk organik. Transaksi jual beli kotoran hewan (benda najis) dalam hal ini hukumnya...', options: ['A. Haram mutlak apapun alasannya', 'B. Boleh karena ada manfaat yang jelas sebagai pupuk', 'C. Makruh karena menjijikkan', 'D. Mubah jika dicuci terlebih dahulu'], answer: 1 },
+            { id: 'pg14', type: 'pg', text: 'Masa pandemi membuat harga masker melambung. Pak Rendi memborong masker di apotek lalu menimbunnya. Sebulan kemudian saat langka, ia menjualnya 10 kali lipat. Praktik ini disebut...', options: ['A. Riba', 'B. Ihtikar (Penimbunan)', 'C. Gharar', 'D. Mudharabah'], answer: 1 },
+            { id: 'pg15', type: 'pg', text: 'Siti bertransaksi jual beli mukena saat adzan salat Jumat berkumandang. Bagi Siti (seorang perempuan), hukum jual beli tersebut adalah...', options: ['A. Haram, karena waktu salat Jumat dilarang berbisnis', 'B. Boleh, karena kewajiban salat Jumat hanya bagi laki-laki', 'C. Batal demi hukum', 'D. Makruh tahrim'], answer: 1 },
+            { id: 'pg16', type: 'pg', text: 'Pak Anton memberi modal Rp 50 juta kepada Riki untuk bisnis kafe (Qirad) dengan perjanjian untung 60% Riki, 40% Anton. Di bulan kedua, kafe sepi karena perbaikan jalan kota dan merugi Rp 5 juta. Siapa yang menanggung rugi?', options: ['A. Riki, karena ia yang mengelola', 'B. Pak Anton sebagai pemilik modal murni', 'C. Dibagi dua sama rata', 'D. Riki mengganti Rp 5 juta dicicil'], answer: 1 },
+            { id: 'pg17', type: 'pg', text: 'Apabila kerugian Rp 5 juta pada bisnis qirad di atas terjadi karena Riki memakai uang modal untuk judi online, maka...', options: ['A. Pak Anton menanggung rugi karena sudah resiko bisnis', 'B. Riki wajib mengganti modal tersebut karena kelalaian/maksiat', 'C. Keduanya menanggung beban 50:50', 'D. Akad otomatis diperpanjang'], answer: 1 },
+            { id: 'pg18', type: 'pg', text: 'Bu Nani (pemodal) mensyaratkan kepada pengelolanya: "Saya modali kamu Rp 10 juta, tapi tiap bulan kamu harus setor untung tetap Rp 500 ribu ke saya apapun kondisinya." Akad Qirad ini...', options: ['A. Sah, sebagai bentuk profesionalisme', 'B. Tidak sah, keuntungan harus persentase bukan nominal pasti', 'C. Sah asalkan ditandatangani di notaris', 'D. Makruh'], answer: 1 },
+            { id: 'pg19', type: 'pg', text: 'Kelebihan utama sistem mudharabah (qirad) dalam perbankan syariah dibandingkan bunga bank konvensional adalah...', options: ['A. Bank tidak pernah rugi', 'B. Keadilan bagi hasil (untung dibagi bersama, rugi finansial ditanggung pemodal)', 'C. Peminjam bebas tidak membayar angsuran', 'D. Suku bunga tetap'], answer: 1 },
+            { id: 'pg20', type: 'pg', text: 'Di tengah jalannya bisnis Qirad, pihak pengelola (mudharib) mendadak meninggal dunia karena kecelakaan. Secara syariat akad tersebut menjadi...', options: ['A. Diwariskan otomatis ke anak pengelola', 'B. Pemilik modal menyita seluruh harta pengelola', 'C. Batal (fasakh) dan dilakukan perhitungan aset', 'D. Berjalan terus tanpa batas waktu'], answer: 2 },
+            { id: 'pg21', type: 'pg', text: 'Andi membeli motor bekas. Karena tidak paham mesin, ia meminta kesepakatan: "Saya bawa dulu, jika dalam 3 hari mesinnya mogok, motor saya kembalikan." Hak Khiyar yang dipakai Andi adalah...', options: ['A. Khiyar Majlis', 'B. Khiyar Aib', 'C. Khiyar Syarat', 'D. Khiyar Ru\'yah'], answer: 2 },
+            { id: 'pg22', type: 'pg', text: 'Dina membeli gamis di butik. Saat ia masih berdiri di dalam toko dan belum keluar pintu, ia melihat warna lain yang lebih bagus lalu menukar pilihannya. Ini merupakan contoh hak...', options: ['A. Khiyar Majlis', 'B. Khiyar Aib', 'C. Khiyar Syarat', 'D. Khiyar Waktu'], answer: 0 },
+            { id: 'pg23', type: 'pg', text: 'Rudi membeli HP baru di toko online. Saat paket tiba dan dibuka, layar HP tersebut retak parah padahal segel masih utuh. Rudi menekan tombol "Komplain Barang". Dalam syariat ini disebut...', options: ['A. Khiyar Majlis', 'B. Khiyar Aib', 'C. Khiyar Syarat', 'D. Khiyar Ghabn'], answer: 1 },
+            { id: 'pg24', type: 'pg', text: 'Hikmah disyariatkannya hak khiyar dalam muamalah ekonomi Islam adalah...', options: ['A. Memberi peluang pembeli mempermainkan penjual', 'B. Menjamin kepuasan, kejujuran, dan menghindarkan penyesalan', 'C. Mencegah berlakunya pajak negara', 'D. Memperlama proses perputaran uang'], answer: 1 },
+            { id: 'pg25', type: 'pg', text: 'Penjual menyembunyikan fakta bahwa mobil yang dijualnya pernah terendam banjir. Enam bulan kemudian, mesin rusak akibat karat. Pembeli baru menyadarinya. Bisakah pembeli menuntut Khiyar Aib?', options: ['A. Bisa, karena aib yang disembunyikan sudah ada sejak sebelum akad', 'B. Tidak bisa karena sudah lewat 3 hari', 'C. Tidak bisa karena mobil barang bekas', 'D. Bisa jika pembeli membayar denda pembatalan'], answer: 0 },
+
+            // --- 10 SOAL PILIHAN GANDA KOMPLEKS (PGK) ---
+            { id: 'pgk1', type: 'pgk', text: 'Pilih 2 kriteria hewan yang SAH untuk dijadikan kurban berdasarkan ketentuan syariat!', options: ['Sapi betina yang sedang bunting 5 bulan', 'Kambing jantan berusia genap 1 tahun (musinnah)', 'Unta yang berusia di bawah 2 tahun', 'Sapi yang usianya sudah genap 2 tahun'], answer: [1, 3] },
+            { id: 'pgk2', type: 'pgk', text: 'Waktu yang SAH untuk melakukan penyembelihan hewan kurban adalah...', options: ['Malam takbiran tanggal 9 Dzulhijjah', 'Setelah salat Idul Adha tanggal 10 Dzulhijjah', 'Siang hari tanggal 11 dan 12 Dzulhijjah (Hari Tasyrik)', 'Sore hari menjelang maghrib tanggal 14 Dzulhijjah'], answer: [1, 2] },
+            { id: 'pgk3', type: 'pgk', text: 'Pernyataan mana saja yang menunjukkan PERBEDAAN antara Kurban dan Akikah?', options: ['Kurban dibagikan mentah, Akikah sunnah dibagikan matang', 'Kurban terkait Dzulhijjah, Akikah terkait kelahiran bayi', 'Kurban khusus unta/sapi, Akikah khusus ayam', 'Kurban wajib bagi semua, Akikah mubah'], answer: [0, 1] },
+            { id: 'pgk4', type: 'pgk', text: 'Pilih tujuan dan hikmah disyariatkannya Akikah!', options: ['Tanda syukur atas anugerah keturunan dari Allah SWT', 'Menghilangkan sifat kikir dalam diri orang tua', 'Sebagai syarat agar anak menjadi pintar', 'Pamer kekayaan kepada tetangga'], answer: [0, 1] },
+            { id: 'pgk5', type: 'pgk', text: 'Transaksi manakah di bawah ini yang tergolong jual beli yang DILARANG (Batal/Fasid) dalam Islam?', options: ['Jual beli alat-alat untuk maksiat/minuman keras', 'Membeli barang dari supplier yang terpercaya', 'Jual beli sistem ijon (buah masih putik di pohon)', 'Menjual hewan ternak hidup-hidup'], answer: [0, 2] },
+            { id: 'pgk6', type: 'pgk', text: 'Rukun pokok terjadinya akad jual beli yang sah harus meliputi unsur-unsur berikut:', options: ['Ada penjual dan pembeli yang berakal sehat', 'Ada saksi minimal 2 orang laki-laki', 'Ada barang yang diperjualbelikan dan diketahui fisiknya', 'Harus menggunakan mata uang dinar murni'], answer: [0, 2] },
+            { id: 'pgk7', type: 'pgk', text: 'Dalam akad Qirad (Mudharabah), syarat harta yang dijadikan MODAL adalah...', options: ['Berupa barang yang mudah membusuk', 'Uang atau aset yang nominalnya diketahui pasti di awal', 'Status kepemilikannya adalah hutang dari pihak ketiga', 'Diserahkan sepenuhnya kepada pengelola untuk dikembangkan bisnis'], answer: [1, 3] },
+            { id: 'pgk8', type: 'pgk', text: 'Terkait risiko kerugian dalam sistem Qirad, pernyataan yang benar adalah:', options: ['Kerugian finansial (krisis) ditanggung oleh pemodal (Shahibul Maal)', 'Pengelola rugi tenaga dan waktunya jika bisnis tidak untung', 'Pemodal bisa menuntut ganti rugi aset ke pengelola jika pasar sepi', 'Pengelola (Mudharib) menanggung 10% kerugian uang dari tabungannya'], answer: [0, 1] },
+            { id: 'pgk9', type: 'pgk', text: 'Sistem Khiyar memberi hak meneruskan/membatalkan akad. Macam-macam khiyar yang dibenarkan syariat adalah...', options: ['Khiyar Majlis (selama masih di tempat akad)', 'Khiyar Ghasab (merampas barang)', 'Khiyar Aib (karena cacat barang)', 'Khiyar Riba (bunga tinggi)'], answer: [0, 2] },
+            { id: 'pgk10', type: 'pgk', text: 'Contoh penerapan Khiyar Syarat yang tepat dalam kehidupan modern adalah...', options: ['Garansi retur toko online selama 7 hari jika barang tidak sesuai deskripsi', 'Mencoba baju di ruang ganti toko lalu mengembalikannya', 'Membatalkan DP rumah secara sepihak setelah 1 tahun', 'Kesepakatan boleh mengembalikan motor bekas dalam 3 hari jika mesinnya mati'], answer: [0, 3] },
+
+            // --- 10 SOAL MENJODOHKAN (MJ) ---
+            { id: 'mj1', type: 'mj', text: 'Hukum mengonsumsi daging kurban bagi orang yang melaksanakan kurban karena NADZAR.', options: ['Wajib', 'Haram', 'Sebelum maghrib 13 Dzulhijjah', 'Kambing cacat/pincang berat', '1 ekor kambing'], answer: 'Haram' },
+            { id: 'mj2', type: 'mj', text: 'Batas akhir waktu yang sah untuk menyembelih hewan kurban.', options: ['Wajib', 'Haram', 'Sebelum maghrib 13 Dzulhijjah', 'Kambing cacat/pincang berat', '1 ekor kambing'], answer: 'Sebelum maghrib 13 Dzulhijjah' },
+            { id: 'mj3', type: 'mj', text: 'Contoh kriteria hewan yang TIDAK SAH dijadikan sebagai hewan kurban.', options: ['Wajib', 'Haram', 'Sebelum maghrib 13 Dzulhijjah', 'Kambing cacat/pincang berat', '1 ekor kambing'], answer: 'Kambing cacat/pincang berat' },
+            { id: 'mj4', type: 'mj', text: 'Ketentuan jumlah penyembelihan hewan akikah untuk bayi perempuan.', options: ['Wajib', 'Haram', 'Sebelum maghrib 13 Dzulhijjah', 'Kambing cacat/pincang berat', '1 ekor kambing'], answer: '1 ekor kambing' },
+            { id: 'mj5', type: 'mj', text: 'Hukum memenuhi akad jual beli yang sudah disepakati (Ijab Qabul).', options: ['Wajib', 'Haram', 'Sebelum maghrib 13 Dzulhijjah', 'Kambing cacat/pincang berat', '1 ekor kambing'], answer: 'Wajib' },
+            { id: 'mj6', type: 'mj', text: 'Ketidakjelasan (spekulasi atau penipuan ukuran) dalam transaksi muamalah ekonomi.', options: ['Gharar', 'Ihtikar', 'Shahibul Maal', 'Mudharib', 'Khiyar Aib'], answer: 'Gharar' },
+            { id: 'mj7', type: 'mj', text: 'Sebutan untuk pihak PEMILIK MODAL dalam sistem bisnis Qirad.', options: ['Gharar', 'Ihtikar', 'Shahibul Maal', 'Mudharib', 'Khiyar Aib'], answer: 'Shahibul Maal' },
+            { id: 'mj8', type: 'mj', text: 'Sebutan untuk pihak PENGELOLA BISNIS dalam sistem bisnis Qirad.', options: ['Gharar', 'Ihtikar', 'Shahibul Maal', 'Mudharib', 'Khiyar Aib'], answer: 'Mudharib' },
+            { id: 'mj9', type: 'mj', text: 'Hak membatalkan pembelian karena pembeli menemukan cacat bawaan pada barang.', options: ['Gharar', 'Ihtikar', 'Shahibul Maal', 'Mudharib', 'Khiyar Aib'], answer: 'Khiyar Aib' },
+            { id: 'mj10', type: 'mj', text: 'Praktik menimbun barang kebutuhan pokok agar harganya melonjak drastis di pasaran.', options: ['Gharar', 'Ihtikar', 'Shahibul Maal', 'Mudharib', 'Khiyar Aib'], answer: 'Ihtikar' },
+
+            // --- 5 SOAL ISIAN SINGKAT (IS) ---
+            { id: 'is1', type: 'is', text: 'Penyembelihan hewan yang dilaksanakan pada hari ketujuh kelahiran bayi sebagai wujud syukur dinamakan...', answer: 'akikah' },
+            { id: 'is2', type: 'is', text: 'Praktik memberikan modal kepada orang lain untuk dikembangkan dengan sistem bagi hasil dalam fiqih disebut akad...', answer: 'qirad' },
+            { id: 'is3', type: 'is', text: 'Hak memilih antara meneruskan jual beli atau membatalkannya selama pembeli dan penjual masih berada di tempat transaksi disebut khiyar...', answer: 'majlis' },
+            { id: 'is4', type: 'is', text: 'Hukum menjual kotoran sapi atau kambing untuk dimanfaatkan sebagai pupuk tanaman organik adalah...', answer: 'mubah' },
+            { id: 'is5', type: 'is', text: 'Berbeda dengan akikah yang disunnahkan matang, daging kurban disunnahkan untuk dibagikan kepada fakir miskin dalam kondisi...', answer: 'mentah' }
+        ];
+
+        // MENGGUNAKAN KEY BARU (_v2) AGAR CACHE BROWSER LAMA (YANG ISINYA 5 SOAL) DIABAIKAN
+        if(!localStorage.getItem('fikihConfig_v2')) localStorage.setItem('fikihConfig_v2', JSON.stringify(DEFAULT_CONFIG));
+        if(!localStorage.getItem('fikihQuestions_v2')) localStorage.setItem('fikihQuestions_v2', JSON.stringify(DEFAULT_QUESTIONS));
+        if(!localStorage.getItem('fikihUsers_v2')) localStorage.setItem('fikihUsers_v2', JSON.stringify([]));
+
+        let config = JSON.parse(localStorage.getItem('fikihConfig_v2'));
+        let questions = JSON.parse(localStorage.getItem('fikihQuestions_v2'));
+        let users = JSON.parse(localStorage.getItem('fikihUsers_v2'));
+        
+        let currentUser = null; 
+        let timerInterval = null;
+        let timeRemaining = config.timeLimit;
+        let userAnswers = {};
+
+        const mainContainer = document.getElementById('main-container');
+        const headerUser = document.getElementById('header-user');
+        const appLogo = document.getElementById('app-logo');
+        appLogo.src = config.logoUrl;
+
+        function renderView(html) { mainContainer.innerHTML = html; }
+
+        function updateHeader() {
+            if (currentUser === 'ADMIN') {
+                headerUser.innerHTML = `<button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white"><i class="fas fa-sign-out-alt"></i> Logout Admin</button>`;
+            } else if (currentUser) {
+                headerUser.innerHTML = `<span class="mr-4"><i class="fas fa-user"></i> ${currentUser.nama} (${currentUser.kelas})</span> <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white"><i class="fas fa-sign-out-alt"></i> Keluar</button>`;
+            } else {
+                headerUser.innerHTML = '';
+            }
+        }
+
+        function logout() {
+            if(confirm('Apakah Anda yakin ingin keluar?')) {
+                clearInterval(timerInterval);
+                currentUser = null;
+                updateHeader();
+                viewLogin();
+            }
+        }
+
+        function viewLogin() {
+            renderView(`
+                <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                    <h2 class="text-2xl font-bold text-center mb-6 text-green-700">Masuk Aplikasi</h2>
+                    
+                    <div class="flex border-b mb-6">
+                        <button class="w-1/2 py-2 font-semibold text-green-700 border-b-2 border-green-700" id="tab-siswa" onclick="switchLogin('siswa')">Siswa</button>
+                        <button class="w-1/2 py-2 font-semibold text-gray-500 hover:text-green-700" id="tab-admin" onclick="switchLogin('admin')">Admin / Guru</button>
+                    </div>
+
+                    <div id="form-siswa">
+                        <input type="text" id="s-nama" placeholder="Nama Lengkap" class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                        <input type="text" id="s-kelas" placeholder="Kelas (Contoh: 9A)" class="w-full mb-6 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                        <button onclick="loginSiswa()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200">Mulai Ujian</button>
+                    </div>
+
+                    <div id="form-admin" class="hide">
+                        <input type="text" id="a-user" placeholder="Username" class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <input type="password" id="a-pass" placeholder="Password" class="w-full mb-6 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <button onclick="loginAdmin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">Login Admin</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function switchLogin(type) {
+            const tabS = document.getElementById('tab-siswa');
+            const tabA = document.getElementById('tab-admin');
+            const formS = document.getElementById('form-siswa');
+            const formA = document.getElementById('form-admin');
+
+            if (type === 'siswa') {
+                formS.classList.remove('hide'); formA.classList.add('hide');
+                tabS.classList.add('border-b-2', 'border-green-700', 'text-green-700'); tabS.classList.remove('text-gray-500');
+                tabA.classList.remove('border-b-2', 'border-green-700', 'text-green-700'); tabA.classList.add('text-gray-500');
+            } else {
+                formA.classList.remove('hide'); formS.classList.add('hide');
+                tabA.classList.add('border-b-2', 'border-green-700', 'text-green-700'); tabA.classList.remove('text-gray-500');
+                tabS.classList.remove('border-b-2', 'border-green-700', 'text-green-700'); tabS.classList.add('text-gray-500');
+            }
+        }
+
+        function loginSiswa() {
+            const nama = document.getElementById('s-nama').value.trim();
+            const kelas = document.getElementById('s-kelas').value.trim();
+            if(!nama || !kelas) return alert('Nama dan kelas wajib diisi!');
+
+            let user = users.find(u => u.nama.toLowerCase() === nama.toLowerCase() && u.kelas.toLowerCase() === kelas.toLowerCase());
+            
+            if(!user) {
+                user = { nama, kelas, attempts: 0, bestScore: 0, history: [] };
+                users.push(user);
+                localStorage.setItem('fikihUsers_v2', JSON.stringify(users));
+            }
+
+            if(user.attempts >= 10) {
+                return alert('Maaf, Anda telah mencapai batas maksimal 10 kali pengerjaan.');
+            }
+
+            currentUser = user;
+            updateHeader();
+            viewPreTest();
+        }
+
+        function loginAdmin() {
+            const user = document.getElementById('a-user').value;
+            const pass = document.getElementById('a-pass').value;
+            if(user === config.adminUser && pass === config.adminPass) {
+                currentUser = 'ADMIN';
+                updateHeader();
+                viewAdminDashboard();
+            } else {
+                alert('Username atau password admin salah!');
+            }
+        }
+
+        function viewAdminDashboard() {
+            renderView(`
+                <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl h-full flex flex-col">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-2"><i class="fas fa-cogs"></i> Panel Admin & Guru</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <button onclick="viewAdminDashboard()" class="bg-green-100 p-3 rounded font-bold text-green-800 hover:bg-green-200">Data Nilai Siswa</button>
+                        <button onclick="viewAdminEditSoal()" class="bg-blue-100 p-3 rounded font-bold text-blue-800 hover:bg-blue-200">Edit Soal</button>
+                        <button onclick="viewAdminPengaturan()" class="bg-purple-100 p-3 rounded font-bold text-purple-800 hover:bg-purple-200">Pengaturan</button>
+                        <button onclick="startTest(true)" class="bg-yellow-100 p-3 rounded font-bold text-yellow-800 hover:bg-yellow-200"><i class="fas fa-play"></i> Uji Coba Soal</button>
+                    </div>
+
+                    <div class="flex-grow overflow-auto" id="admin-content">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">Rekapitulasi Nilai Siswa</h3>
+                            <button onclick="downloadExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"><i class="fas fa-file-excel"></i> Download Excel</button>
+                        </div>
+                        <table class="min-w-full bg-white border">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-2 px-4 border">Nama Siswa</th>
+                                    <th class="py-2 px-4 border">Kelas</th>
+                                    <th class="py-2 px-4 border">Pengerjaan Ke-</th>
+                                    <th class="py-2 px-4 border">Nilai Tertinggi</th>
+                                    <th class="py-2 px-4 border">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${users.length === 0 ? '<tr><td colspan="5" class="text-center py-4">Belum ada data siswa.</td></tr>' : 
+                                  users.map(u => `
+                                    <tr class="text-center border-t">
+                                        <td class="py-2 px-4 border">${u.nama}</td>
+                                        <td class="py-2 px-4 border">${u.kelas}</td>
+                                        <td class="py-2 px-4 border">${u.attempts} / 10</td>
+                                        <td class="py-2 px-4 font-bold ${u.bestScore >= config.kkm ? 'text-green-600' : 'text-red-600'}">${u.bestScore}</td>
+                                        <td class="py-2 px-4 border">${u.bestScore >= config.kkm ? 'Tuntas' : 'Belum Tuntas'}</td>
+                                    </tr>
+                                  `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `);
+        }
+
+        function downloadExcel() {
+            let csvContent = "data:text/csv;charset=utf-8,Nama,Kelas,Pengerjaan,Nilai Tertinggi,Status\n";
+            users.forEach(u => {
+                let status = u.bestScore >= config.kkm ? 'Tuntas' : 'Belum Tuntas';
+                csvContent += `${u.nama},${u.kelas},${u.attempts},${u.bestScore},${status}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Nilai_Fikih_Kelas9.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function viewAdminPengaturan() {
+            document.getElementById('admin-content').innerHTML = `
+                <h3 class="text-xl font-bold mb-4">Pengaturan Aplikasi</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 border rounded">
+                        <h4 class="font-bold mb-2">Ubah Password Admin</h4>
+                        <input type="text" id="new-user" placeholder="Username Baru" value="${config.adminUser}" class="w-full mb-2 p-2 border rounded">
+                        <input type="password" id="new-pass" placeholder="Password Baru" class="w-full mb-2 p-2 border rounded">
+                        <button onclick="saveAdminAuth()" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Simpan Akun</button>
+                    </div>
+                    <div class="p-4 border rounded">
+                        <h4 class="font-bold mb-2">Ubah Logo Instansi (URL/Link Gambar)</h4>
+                        <input type="text" id="new-logo" placeholder="URL Gambar Logo" value="${config.logoUrl}" class="w-full mb-2 p-2 border rounded">
+                        <button onclick="saveLogo()" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Simpan Logo</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveAdminAuth() {
+            const u = document.getElementById('new-user').value;
+            const p = document.getElementById('new-pass').value;
+            if(!u || !p) return alert('Username dan Password tidak boleh kosong!');
+            config.adminUser = u; config.adminPass = p;
+            localStorage.setItem('fikihConfig_v2', JSON.stringify(config));
+            alert('Akun admin berhasil diperbarui.');
+        }
+
+        function saveLogo() {
+            const l = document.getElementById('new-logo').value;
+            if(!l) return alert('URL logo tidak boleh kosong!');
+            config.logoUrl = l;
+            localStorage.setItem('fikihConfig_v2', JSON.stringify(config));
+            appLogo.src = l;
+            alert('Logo berhasil diperbarui.');
+        }
+
+        function viewAdminEditSoal() {
+            document.getElementById('admin-content').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Database Soal (JSON Format)</h3>
+                    <button onclick="saveQuestions()" class="bg-blue-600 text-white px-4 py-2 rounded">Simpan Perubahan Soal</button>
+                </div>
+                <p class="text-sm text-gray-600 mb-2 font-bold">Total Soal Saat Ini Tercatat: ${questions.length} / 50 Nomor.</p>
+                <textarea id="json-soal" class="w-full h-64 p-4 border rounded font-mono text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">${JSON.stringify(questions, null, 4)}</textarea>
+            `;
+        }
+
+        function saveQuestions() {
+            try {
+                const parsed = JSON.parse(document.getElementById('json-soal').value);
+                questions = parsed;
+                localStorage.setItem('fikihQuestions_v2', JSON.stringify(questions));
+                alert('Berhasil menyimpan soal!');
+                viewAdminEditSoal();
+            } catch (e) {
+                alert('Format soal tidak valid! Pastikan tidak ada tanda kutip atau kurung kurawal yang terhapus.');
+            }
+        }
+
+        function viewPreTest() {
+            renderView(`
+                <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg text-center">
+                    <h2 class="text-2xl font-bold mb-2">Selamat Datang, ${currentUser.nama}!</h2>
+                    <p class="text-gray-600 mb-6">Kelas: ${currentUser.kelas}</p>
+                    
+                    <div class="bg-blue-50 p-4 rounded text-left mb-6">
+                        <ul class="list-disc list-inside space-y-2 text-sm text-blue-800">
+                            <li>Mata Pelajaran: <b>FIKIH</b> (Kurban, Akikah, Jual Beli, Qirad, Khiyar)</li>
+                            <li>Jumlah Soal: <b>50 Soal</b> (Sistem akan memuat 50 nomor ke bawah)</li>
+                            <li>Waktu Pengerjaan: <b>${config.timeLimit / 60} Menit</b></li>
+                            <li>Nilai KKM: <b>${config.kkm}</b></li>
+                            <li>Sisa Kesempatan: <b>${10 - currentUser.attempts} kali</b></li>
+                        </ul>
+                    </div>
+
+                    <button onclick="startTest(false)" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-lg transition duration-200">
+                        <i class="fas fa-play-circle mr-2"></i> Mulai Asesmen Sekarang
+                    </button>
+                </div>
+            `);
+        }
+
+        function startTest(isAdminTrial = false) {
+            if (!isAdminTrial) {
+                currentUser.attempts += 1;
+                localStorage.setItem('fikihUsers_v2', JSON.stringify(users));
+            }
+            
+            userAnswers = {};
+            timeRemaining = config.timeLimit;
+            
+            renderQuizUI();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                document.getElementById('timer-display').innerText = formatTime(timeRemaining);
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Waktu habis! Jawaban akan dikirim otomatis.');
+                    submitTest(isAdminTrial);
+                }
+            }, 1000);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function renderQuizUI() {
+            let html = `
+                <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl h-full flex flex-col">
+                    <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <h2 class="text-xl font-bold text-green-800">Lembar Soal Asesmen (50 Nomor)</h2>
+                        <div class="bg-red-100 text-red-700 px-4 py-2 rounded font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-clock"></i> <span id="timer-display">${formatTime(timeRemaining)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-grow overflow-auto pr-2 pb-4 space-y-8" id="questions-container">
+            `;
+
+            questions.forEach((q, index) => {
+                const num = index + 1; // Menjamin nomor urut pasti 1 sampai 50
+                html += `<div class="p-4 border rounded bg-gray-50 shadow-sm" id="q-container-${q.id}">`;
+                html += `<p class="font-bold mb-3">${num}. ${q.text}</p>`;
+
+                if (q.type === 'pg') {
+                    q.options.forEach((opt, i) => {
+                        html += `
+                            <label class="block p-2 border rounded mb-2 cursor-pointer hover:bg-green-50 ${userAnswers[q.id] === i ? 'bg-green-100 border-green-500' : 'bg-white'}">
+                                <input type="radio" name="${q.id}" value="${i}" onchange="saveAnswer('${q.id}', ${i})" class="mr-2">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                } else if (q.type === 'pgk') {
+                    html += `<p class="text-xs text-blue-600 mb-2 italic">*Pilih semua jawaban yang benar (Centang lebih dari 1 jika perlu)</p>`;
+                    q.options.forEach((opt, i) => {
+                        html += `
+                            <label class="block p-2 border rounded mb-2 cursor-pointer hover:bg-green-50 bg-white">
+                                <input type="checkbox" name="${q.id}" value="${i}" onchange="saveAnswerPGK('${q.id}', ${i}, this.checked)" class="mr-2">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                } else if (q.type === 'mj') {
+                    html += `
+                        <select onchange="saveAnswer('${q.id}', this.value)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white cursor-pointer">
+                            <option value="">-- Pilih Pasangan Jawaban --</option>
+                            ${q.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                        </select>
+                    `;
+                } else if (q.type === 'is') {
+                    html += `
+                        <input type="text" onchange="saveAnswer('${q.id}', this.value)" placeholder="Ketik jawaban singkat..." class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                    `;
+                }
+
+                html += `</div>`;
+            });
+
+            html += `
+                    </div>
+                    <div class="border-t pt-4 mt-2">
+                        <button onclick="submitTest(${currentUser === 'ADMIN'})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-lg transition duration-200">
+                            Selesai & Kumpulkan
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            renderView(html);
+        }
+
+        function saveAnswer(qId, val) { userAnswers[qId] = val; }
+
+        function saveAnswerPGK(qId, optIdx, isChecked) {
+            if(!userAnswers[qId]) userAnswers[qId] = [];
+            if(isChecked) {
+                userAnswers[qId].push(optIdx);
+            } else {
+                userAnswers[qId] = userAnswers[qId].filter(v => v !== optIdx);
+            }
+        }
+
+        function submitTest(isAdminTrial) {
+            if(!confirm('Apakah Anda yakin sudah selesai dan ingin mengumpulkan jawaban?')) return;
+            
+            clearInterval(timerInterval);
+            let correctCount = 0;
+            let totalQuestions = questions.length; // Pasti 50
+
+            questions.forEach(q => {
+                const ans = userAnswers[q.id];
+                if (q.type === 'pg' || q.type === 'mj') {
+                    if(ans === q.answer) correctCount++;
+                } else if (q.type === 'pgk') {
+                    if(ans && Array.isArray(ans)) {
+                        const isCorrect = q.answer.length === ans.length && q.answer.every(v => ans.includes(v));
+                        if(isCorrect) correctCount++;
+                    }
+                } else if (q.type === 'is') {
+                    if(ans && ans.toString().toLowerCase().trim() === q.answer.toLowerCase().trim()) correctCount++;
+                }
+            });
+
+            const finalScore = Math.round((correctCount / totalQuestions) * 100);
+            
+            if(!isAdminTrial) {
+                if(finalScore > currentUser.bestScore) currentUser.bestScore = finalScore;
+                currentUser.history.push({ date: new Date().toLocaleString(), score: finalScore });
+                localStorage.setItem('fikihUsers_v2', JSON.stringify(users));
+            }
+
+            renderResult(finalScore, isAdminTrial, correctCount);
+        }
+
+        function renderResult(score, isAdminTrial, correctCount) {
+            const isPassed = score >= config.kkm;
+            renderView(`
+                <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center">
+                    <div class="mb-4 text-6xl ${isPassed ? 'text-green-500' : 'text-red-500'}">
+                        <i class="fas ${isPassed ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-2">Skor Akhir: ${score}</h2>
+                    <p class="text-md text-gray-600 mb-2">Benar ${correctCount} dari 50 soal</p>
+                    <p class="text-xl font-semibold mb-6 ${isPassed ? 'text-green-600' : 'text-red-600'}">
+                        ${isPassed ? 'SELAMAT! Anda Tuntas.' : 'Mohon Maaf, Anda Belum Tuntas.'}
+                    </p>
+                    
+                    ${isAdminTrial ? '<p class="text-sm text-yellow-600 font-bold mb-4">Ini adalah mode Uji Coba Admin. Nilai tidak direkam.</p>' : ''}
+                    
+                    <div class="space-y-3 mt-6">
+                        ${!isAdminTrial ? `<button onclick="downloadStudentResult(${score})" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"><i class="fas fa-download"></i> Download Hasil Ujian</button>` : ''}
+                        
+                        <button onclick="${isAdminTrial ? 'viewAdminDashboard()' : 'viewPreTest()'}" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 rounded">Kembali ke Dashboard</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function downloadStudentResult(score) {
+            const text = `HASIL ASESMEN SUMATIF TENGAH SEMESTER FIKIH\nMTs Muallimin NU Kota Malang\n\nNama Siswa: ${currentUser.nama}\nKelas: ${currentUser.kelas}\nTanggal: ${new Date().toLocaleString()}\n\nSkor Anda: ${score}\nKKM: ${config.kkm}\nStatus: ${score >= config.kkm ? 'TUNTAS' : 'BELUM TUNTAS'}\n\nTerima kasih.`;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Hasil_Ujian_${currentUser.nama.replace(/\s+/g, '_')}.txt`;
+            link.click();
+        }
+
+        viewLogin();
+
+    </script>
+</body>
+</html>
